@@ -1,0 +1,382 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Consignment</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!-- Include html2canvas and jsPDF -->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+   <style>
+        @media print {
+    body {
+        font-size: 17px; /* Consistent font size */
+    }
+.btn-download, .btn-print {
+            display: none; /* Hide buttons during printing */
+        }
+    img {
+        width: 150px; /* Ensure the logo doesn't stretch */
+        height: auto;
+    }
+
+    table {
+        width: 100%;
+        font-size: 15px; /* Smaller font size for tables */
+        border-collapse: collapse;
+        table-layout: auto; /* Automatically adjust column sizes */
+    }
+
+    td, th {
+        padding: 3px;
+        border: 1px solid black;
+        word-wrap: break-word; /* Prevent overflow in the table */
+    }
+
+    .page-break {
+        page-break-before: always;
+    }
+}
+td, th {
+    word-wrap: break-word; /* Ensure long words break into the next line */
+}
+
+
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 0;
+            }
+            .btn-print {
+                width: 100%;
+                margin-bottom: 1px;
+            }
+            table {
+                font-size: 15px;
+            }
+            img {
+    max-width: 100%; /* Ensure images do not overflow */
+    height: auto; /* Maintain aspect ratio */
+}
+
+        }
+
+        /* General table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            margin: 0;
+        }
+        td, th {
+    padding: 3px; /* Slightly increase padding */
+    margin: 0;
+}
+
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .flex-container img {
+             max-width: 100%; /* Ensure images do not overflow */
+    height: auto; /* Maintain aspect ratio */
+        }
+        .flex-container div {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+<script>
+async function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'pt', 'a4');
+
+    const allInvoiceContent = document.getElementById('all-invoice-content'); // Updated ID
+
+    await html2canvas(allInvoiceContent, {
+        scale: 2
+    }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+
+        // Get original dimensions
+        const imgWidth = pdf.internal.pageSize.getWidth();
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+
+        // Scale down by reducing the width and height
+        const scaleFactor = 0.9;  // Adjust this value to make it smaller or larger
+        const scaledWidth = imgWidth * scaleFactor;
+        const scaledHeight = imgHeight * scaleFactor;
+
+        // Add margin for centering (you can adjust the margin as needed)
+        const marginX = (pdf.internal.pageSize.getWidth() - scaledWidth) / 2;
+        const marginY = (pdf.internal.pageSize.getHeight() - scaledHeight) / 2;
+
+        // Add the scaled image at the center
+        pdf.addImage(imgData, 'PNG', marginX, marginY, scaledWidth, scaledHeight);
+        pdf.save('invoice.pdf');
+    }).catch(error => {
+        console.error('Error generating PDF:', error);
+    });
+}
+</script>
+
+
+
+    <a href="javascript:window.print()" class="btn btn-danger btn-print">Print</a>
+<button class="btn-download btn btn-primary" onclick="downloadPDF()">Download PDF</button>
+
+<div id="all-invoice-content">
+    {% if 'Consignee Copy' in copy_types %}
+    <div class="container invoice" id="invoice-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+    <p class="text-left" style="margin: 0;"><strong>Shri Sai Logistics</strong></p>
+    <p class="text-center" style="margin: 0;"><strong>RECEIVER COPY</strong></p>
+    <p class="text-right" style="margin: 0;"><strong>Helpline No: 6362319640 | 7204914028</strong></p>
+</div>
+
+        <table class="table table-bordered mt-3">
+            <tbody>
+                {% for details in consignment_details %}
+                <tr>
+                    <td colspan="2"><strong>Shipper:</strong> {{ details.sender_name }}<br>
+                        Mobile No: {{ details.sender_mobile }}<br>
+                        Address: {{ details.sender_address }}</td>
+                    <td colspan="2"><strong>Receiver:</strong> {{ details.receiver_name }}<br>
+                        Mobile: {{ details.receiver_mobile }}<br>
+                        Address: {{ details.receiver_address }}</td>
+                    <td>
+                        <p><strong>From: {{ details.route_from }}</strong></p>
+                        <p><strong>To: {{ details.route_to }}</strong></p>
+                    </td>
+                    <td rowspan="2">
+                        <p><strong>Invoice</strong></p><hr>
+                        <p>Freight: {{ details.freight }}</p>
+                        <p>Hamali: {{ details.hamali }}</p>
+                        <p>Door Charge: {{ details.door_charge }}</p>
+                        <p>ST Charge: {{ details.st_charge }}</p>
+                        <hr>
+                        <p><strong>Total: {{ details.total_cost }}</strong></p>
+                    </td>
+                </tr>
+                <tr>
+                     <td colspan="2">
+                       <strong>Order No. {{ details.track_id }}</strong>
+    <img src="{{ details.barcode_image.url }}" style="width: 250px; height: 80px;" alt="Barcode for Track ID {{ details.track_id }}">
+
+                    </td>
+                    <td colspan="2">
+                        <strong>
+                            <p>Packages: {{ details.pieces }}</p>
+                            <p>Contents: {{ details.category }}</p>
+                            <p>Weight: {{ details.weight }}</p>
+                            <p>E-Way Bill: {{ details.eway_bill }}</p>
+                        </strong>
+                    </td>
+                    <td>
+                        <strong><p>Payer: {{ details.pay_status }}</p></strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" rowspan="2">
+                        <div class="flex-container">
+                            <img src="{% static 'images/logo.png' %}" alt="Company Logo"/>
+                            <div><strong>
+                                {{ branchdetails.companyname }}<br>
+                                {{ branchdetails.address }}<br></strong>
+                            </div>
+                        </div>
+                    </td>
+                    <td colspan="2" rowspan="2">
+                        <div class="flex-container">
+                            <div>
+                                <strong>Bill To&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    Date: {{ details.date }}</strong><br>
+                                <strong>{{ details.sender_name }}</strong><br>
+                                Mobile No: {{ details.sender_mobile }}<br>
+                                Address: {{ details.sender_address }}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <strong>Receiver:</strong>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+<hr>
+{% if 'Lorry Copy' in copy_types %}
+    <div class="container invoice" id="lorry-content">
+<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+    <p class="text-left" style="margin: 0;"><strong>Shri Sai Logistics</strong></p>
+    <p class="text-center" style="margin: 0;"><strong>ORIGINAL COPY</strong></p>
+    <p class="text-right" style="margin: 0;"><strong>Helpline No: 6362319640 | 7204914028</strong></p>
+</div>
+        <table class="table table-bordered mt-3">
+            <tbody>
+                {% for details in consignment_details %}
+                <tr>
+                    <td colspan="2"><strong>Shipper:</strong> {{ details.sender_name }}<br>
+                        Mobile No: {{ details.sender_mobile }}<br>
+                        Address: {{ details.sender_address }}</td>
+                    <td colspan="2"><strong>Receiver:</strong> {{ details.receiver_name }}<br>
+                        Mobile: {{ details.receiver_mobile }}<br>
+                        Address: {{ details.receiver_address }}</td>
+                    <td>
+                        <p><strong>From: {{ details.route_from }}</strong></p>
+                        <p><strong>To: {{ details.route_to }}</strong></p>
+                    </td>
+                    <td rowspan="2">
+                        <p><strong>Invoice</strong></p><hr>
+                        <p>Freight: {{ details.freight }}</p>
+                        <p>Hamali: {{ details.hamali }}</p>
+                        <p>Door Charge: {{ details.door_charge }}</p>
+                        <p>ST Charge: {{ details.st_charge }}</p>
+                        <hr>
+                        <p><strong>Total: {{ details.total_cost }}</strong></p>
+                    </td>
+                </tr>
+                <tr>
+                     <td colspan="2">
+                       <strong>Order No. {{ details.track_id }}</strong>
+    <img src="{{ details.barcode_image.url }}" style="width: 250px; height: 80px;" alt="Barcode for Track ID {{ details.track_id }}">
+
+                    </td>
+                    <td colspan="2">
+                        <strong>
+                            <p>Packages: {{ details.pieces }}</p>
+                            <p>Contents: {{ details.category }}</p>
+                            <p>Weight: {{ details.weight }}</p>
+                            <p>E-Way Bill: {{ details.eway_bill }}</p>
+                        </strong>
+                    </td>
+                    <td>
+                        <strong><p>Payer: {{ details.pay_status }}</p></strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" rowspan="2">
+                        <div class="flex-container">
+                            <img src="{% static 'images/logo.png' %}" alt="Company Logo"/>
+                            <div><strong>
+                                {{ branchdetails.companyname }}<br>
+                                {{ branchdetails.address }}<br></strong>
+                            </div>
+                        </div>
+                    </td>
+                    <td colspan="2" rowspan="2">
+                        <div class="flex-container">
+                            <div>
+                                <strong>Bill To&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    Date: {{ details.date }}</strong><br>
+                                <strong>{{ details.sender_name }}</strong><br>
+                                Mobile No: {{ details.sender_mobile }}<br>
+                                Address: {{ details.sender_address }}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <strong>Receiver:</strong>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    <hr>
+
+    {% if 'Consignor Copy' in copy_types %}
+    <div class="container invoice" id="consignor-content">
+<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+    <p class="text-left" style="margin: 0;"><strong>Shri Sai Logistics</strong></p>
+    <p class="text-center" style="margin: 0;"><strong>SHIPPER COPY</strong></p>
+    <p class="text-right" style="margin: 0;"><strong>Helpline No: 6362319640 | 7204914028</strong></p>
+</div>
+        <table class="table table-bordered mt-3">
+            <tbody>
+                {% for details in consignment_details %}
+                <tr>
+                    <td colspan="2"><strong>Shipper:</strong> {{ details.sender_name }}<br>
+                        Mobile No: {{ details.sender_mobile }}<br>
+                        Address: {{ details.sender_address }}</td>
+                    <td colspan="2"><strong>Receiver:</strong> {{ details.receiver_name }}<br>
+                        Mobile: {{ details.receiver_mobile }}<br>
+                        Address: {{ details.receiver_address }}</td>
+                    <td>
+                        <p><strong>From: {{ details.route_from }}</strong></p>
+                        <p><strong>To: {{ details.route_to }}</strong></p>
+                    </td>
+                    <td rowspan="2">
+                        <p><strong>Invoice</strong></p><hr>
+                        <p>Freight: {{ details.freight }}</p>
+                        <p>Hamali: {{ details.hamali }}</p>
+                        <p>Door Charge: {{ details.door_charge }}</p>
+                        <p>ST Charge: {{ details.st_charge }}</p>
+                        <hr>
+                        <p><strong>Total: {{ details.total_cost }}</strong></p>
+                    </td>
+                </tr>
+                <tr>
+                     <td colspan="2">
+                       <strong>Order No. {{ details.track_id }}</strong>
+    <img src="{{ details.barcode_image.url }}" style="width: 250px; height: 80px;" alt="Barcode for Track ID {{ details.track_id }}">
+
+                    </td>
+                    <td colspan="2">
+                        <strong>
+                            <p>Packages: {{ details.pieces }}</p>
+                            <p>Contents: {{ details.category }}</p>
+                            <p>Weight: {{ details.weight }}</p>
+                            <p>E-Way Bill: {{ details.eway_bill }}</p>
+                        </strong>
+                    </td>
+                    <td>
+                        <strong><p>Payer: {{ details.pay_status }}</p></strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" rowspan="2">
+                        <div class="flex-container">
+                            <img src="{% static 'images/logo.png' %}" alt="Company Logo"/>
+                            <div><strong>
+                                {{ branchdetails.companyname }}<br>
+                                {{ branchdetails.address }}<br></strong>
+                            </div>
+                        </div>
+                    </td>
+                    <td colspan="2" rowspan="2">
+                        <div class="flex-container">
+                            <div>
+                                <strong>Bill To&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    Date: {{ details.date }}</strong><br>
+                                <strong>{{ details.sender_name }}</strong><br>
+                                Mobile No: {{ details.sender_mobile }}<br>
+                                Address: {{ details.sender_address }}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <strong>Receiver:</strong>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>

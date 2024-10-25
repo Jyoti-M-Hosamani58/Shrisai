@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consignment Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+        .consignment-details {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        .consignment-details h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .detail {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="consignment-details">
+        <h1>Consignment Details</h1>
+        <div class="detail"><strong>Track ID:</strong> {{ consignment.track_id }}</div>
+        <div class="detail"><strong>Sender Name:</strong> {{ consignment.sender_name }}</div>
+        <div class="detail"><strong>Receiver Name:</strong> {{ consignment.receiver_name }}</div>
+        <div class="detail"><strong>Receiver Mobile:</strong> {{ consignment.receiver_mobile }}</div>
+        <div class="detail"><strong>Receiver Address:</strong> {{ consignment.receiver_address }}</div>
+        <div class="detail"><strong>Route From:</strong> {{ consignment.route_from }}</div>
+        <div class="detail"><strong>Route To:</strong> {{ consignment.route_to }}</div>
+        <div class="detail"><strong>Total Cost:</strong> {{ consignment.total_cost }}</div>
+    </div>
+</body>
+</html>

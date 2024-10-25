@@ -1,0 +1,298 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Untree.co" />
+    <link rel="shortcut icon" href="{% static 'favicon.png' %}" />
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="bootstrap, bootstrap5" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'fonts/flaticon/font/flaticon.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'css/tiny-slider.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/aos.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <title>
+Consignment    </title>
+      <style>
+          .suggestions-box {
+    border: 1px solid #ddd;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: white;
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+}
+
+.suggestions-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.suggestions-box li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.suggestions-box li:hover {
+    background-color: #f0f0f0;
+}
+
+      </style>
+      <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            margin-right: 10px;
+        }
+        .form-control {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        #consignorSearch {
+            margin-bottom: 15px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="site-mobile-menu site-navbar-target">
+      <div class="site-mobile-menu-header">
+        <div class="site-mobile-menu-close">
+          <span class="icofont-close js-menu-toggle"></span>
+        </div>
+      </div>
+      <div class="site-mobile-menu-body"></div>
+    </div>
+
+    {% include 'index_menu.html' %}
+<br><br><br>
+     <div class="container">
+        <div class="row justify-content-center align-items-center">
+          <div class="col-lg-9 text-center mt-5">
+            <h1 class="heading" data-aos="fade-up">Dashboard</h1>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  <!--Content -->
+    <form method="post"action="{% url 'dashboard' %}">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-3">
+                <input type="date" id="from_date" name="from_date" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <input type="date" id="to_date" name="to_date" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="form-control btn-primary">Search</button>
+            </div>
+        </div>
+    </form><br><br>
+    <hr>
+<!-- Canvas element for the bar chart -->
+        <canvas id="barChart" width="800" height="400"></canvas>
+    <br><br>
+
+    {% if consignments_summary %}
+        <h2>Summary : {{ from_date }} to {{ to_date }}</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Orders</th>
+                    <th>Weight</th>
+                    <th>Packages</th>
+                    <th>Revenue (RS)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for consignment in consignments_summary %}
+                <tr>
+                    <td>{{ consignment.category }}</td>
+                    <td>{{ consignment.count_track_id }}</td>
+                    <td>{{ consignment.total_weight }}</td>
+                    <td>{{ consignment.total_pieces }}</td>
+                    <td>{{ consignment.grand_total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+<script>
+    const consignments = JSON.parse('{{ consignments_json|escapejs }}');  // Parsing JSON data
+    console.log('Consignments data:', consignments);
+
+    const categories = consignments.map(c => c.category);
+    const orders = consignments.map(c => c.count_track_id);
+    const weights = consignments.map(c => c.total_weight);
+    const revenues = consignments.map(c => c.grand_total);
+
+    console.log('Categories:', categories);
+    console.log('Orders:', orders);
+    console.log('Weights:', weights);
+    console.log('Revenues:', revenues);
+
+    const ctx = document.getElementById('barChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: categories,  // Array of category names
+            datasets: [
+                {
+                    label: 'Orders',
+                    data: orders,  // Array of orders data
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Weight',
+                    data: weights,  // Array of weights data
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Revenue',
+                    data: revenues,  // Array of revenues data
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += new Intl.NumberFormat('en-US', {
+                                    style: 'decimal',
+                                    maximumFractionDigits: 2
+                                }).format(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+<script>
+    const consignments = {{ consignments_summary|safe }};
+    console.log('Consignments data:', consignments);
+
+    const categories = consignments.map(c => c.category);
+    const orders = consignments.map(c => c.count_track_id);
+    const weights = consignments.map(c => c.total_weight);
+    const revenues = consignments.map(c => c.grand_total);
+
+    console.log('Categories:', categories);
+    console.log('Orders:', orders);
+    console.log('Weights:', weights);
+    console.log('Revenues:', revenues);
+</script>
+
+    {% endif %}
+<div class="row mt-5">
+          <div class="col-12 text-center">
+            <!--
+              **==========
+              NOTE:
+              Please don't remove this copyright link unless you buy the license here https://untree.co/license/
+              **==========
+            -->
+          </div>
+        </div>
+      </div>
+      <!-- /.container -->
+    </div>
+    <!-- /.site-footer -->
+
+    <!-- Preloader -->
+    <div id="overlayer"></div>
+    <div class="loader">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/tiny-slider.js' %}"></script>
+    <script src="{% static 'js/aos.js' %}"></script>
+    <script src="{% static 'js/navbar.js' %}"></script>
+    <script src="{% static 'js/counter.js' %}"></script>
+    <script src="{% static 'js/custom.js' %}"></script>
+  </body>
+</html>

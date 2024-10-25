@@ -1,0 +1,1128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Untree.co" />
+    <link rel="shortcut icon" href="{% static 'favicon.png' %}" />
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="bootstrap, bootstrap5" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'fonts/flaticon/font/flaticon.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'css/tiny-slider.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/aos.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <title>
+Consignment    </title>
+      <style>
+          .suggestions-box {
+    border: 1px solid #ddd;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: white;
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+}
+
+.suggestions-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.suggestions-box li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.suggestions-box li:hover {
+    background-color: #f0f0f0;
+}
+
+      </style>
+  </head>
+  <body>
+    <div class="site-mobile-menu site-navbar-target">
+      <div class="site-mobile-menu-header">
+        <div class="site-mobile-menu-close">
+          <span class="icofont-close js-menu-toggle"></span>
+        </div>
+      </div>
+      <div class="site-mobile-menu-body"></div>
+    </div>
+
+    {% include 'index_menu.html' %}
+<br><br><br></br>
+     <div class="container">
+        <div class="row justify-content-center align-items-center">
+          <div class="col-lg-9 text-center mt-5">
+            <h1 class="heading" data-aos="fade-up">Edit Orders</h1>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+<div class="background-container"></div>
+    <div class="content">
+    <div id="consignmentForm" class="container">
+        <form method="post">
+    {% csrf_token %}
+    <p style="color:red;text-align:center;font-size:22px;font-weight:bold">{{msg}}</p>
+            <div class="row">
+
+            <input type="hidden" id="branch" name="branch" class="form-control" value="{{ userdata.branch }}" readonly>
+
+
+
+<div class="col-md-6">
+    <br/>
+            <input type="text" id="track_id" name="track_id" class="form-control" value="{{ userdata.track_id }}" readonly>
+        </div>
+                        <div class="col-md-6">
+    <label for="status">Status:</label>
+    <select id="status" name="status" class="form-control" onchange="toggleReasonBox()">
+        <option value="{{ userdata.status }}" selected>{{ userdata.status }}</option>
+        {% if userdata.status != 'Active' %}
+            <option value="Active">Active</option>
+        {% endif %}
+        {% if userdata.status != 'Cancel' %}
+            <option value="Cancel">Cancel</option>
+        {% endif %}
+    </select>
+</div>
+
+
+<!-- Hidden reason input box (initially hidden) -->
+<div id="reasonBox" style="display:none;" class="col-md-6">
+    <label for="reason">Reason:</label>
+    <input type="text" id="reason" name="reason" class="form-control">
+</div>
+
+<!-- JavaScript to toggle the reason input box -->
+<script>
+    function toggleReasonBox() {
+        var statusSelect = document.getElementById('status');
+        var reasonBox = document.getElementById('reasonBox');
+        var selectedStatus = statusSelect.value;
+
+        // Show the reason box if the selected status is different from the current status
+        if (selectedStatus !== '{{ userdata.status }}') {
+            reasonBox.style.display = 'block'; // Show reason input box
+        } else {
+            reasonBox.style.display = 'none'; // Hide reason input box
+        }
+    }
+</script>
+                </div></br></br>
+<div class="tracking-container">
+    <div class="tracking-header">
+        <h4>Order Tracking Stages</h4>
+    </div>
+    <div class="tracking-steps">
+        <div class="step">
+    <!-- Picked Stage -->
+    <div class="step-item">
+        <label for="picked" class="step-label">Picked</label>
+        <input type="checkbox" class="step-checkbox" id="picked" name="stage" value="Picked"
+            {% if "Picked" in stage_names %} checked {% endif %}>
+        <span class="checkmark"></span>
+       {% if "Picked" in stage_names %}
+    {% for stage in stage_details %}
+        {% if stage.stage == "Picked" %}
+        <div class="stage-info">
+            <br><strong>{{ stage.Branch }},{{ stage.branchlocation }}, {{ stage.Date|date:"d-m-Y" }},<br/>{{ stage.Time }},{{ stage.username }}</p>
+        </strong></div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+
+    </div>
+
+    <!-- Staged at SD Stage -->
+    <div class="step-item">
+        <label for="sd" class="step-label">Staged at SD</label>
+        <input type="checkbox" class="step-checkbox" id="sd" name="stage" value="Staged at SD"
+            {% if "Staged at SD" in stage_names %} checked {% endif %}>
+        <span class="checkmark"></span>
+         {% if "Staged at SD" in stage_names %}
+    {% for stage in stage_details %}
+        {% if stage.stage == "Staged at SD" %}
+        <div class="stage-info">
+            <br><strong>{{ stage.Branch }},{{ stage.branchlocation }}, {{ stage.Date|date:"d-m-Y" }},<br/>{{ stage.Time }},{{ stage.username }}</p>
+        </strong></div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+    </div>
+
+    <!-- In Transit Stage -->
+    <div class="step-item">
+        <label for="transit" class="step-label">In Transit</label>
+        <input type="checkbox" class="step-checkbox" id="transit" name="stage" value="In Transit"
+            {% if "In Transit" in stage_names %} checked {% endif %}>
+        <span class="checkmark"></span>
+         {% if "In Transit" in stage_names %}
+    {% for stage in stage_details %}
+        {% if stage.stage == "In Transit" %}
+        <div class="stage-info">
+            <br><strong>{{ stage.Branch }},{{ stage.branchlocation }}, {{ stage.Date|date:"d-m-Y" }},<br/>{{ stage.Time }},{{ stage.username }}</p>
+        </strong></div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+    </div>
+
+    <!-- Staged at DD Stage -->
+    <div class="step-item">
+        <label for="dd" class="step-label">Staged at DD</label>
+        <input type="checkbox" class="step-checkbox" id="dd" name="stage" value="Staged at DD"
+            {% if "Staged at DD" in stage_names %} checked {% endif %}>
+        <span class="checkmark"></span>
+         {% if "Staged at DD" in stage_names %}
+    {% for stage in stage_details %}
+        {% if stage.stage == "Staged at DD" %}
+        <div class="stage-info">
+            <br><strong>{{ stage.Branch }},{{ stage.branchlocation }}, {{ stage.Date|date:"d-m-Y" }},<br/>{{ stage.Time }},{{ stage.username }}</p>
+        </strong></div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+    </div>
+
+    <!-- Out for Delivery Stage -->
+    <div class="step-item">
+        <label for="out" class="step-label">Out for Delivery</label>
+        <input type="checkbox" class="step-checkbox" id="out" name="stage" value="Out for Delivery"
+            {% if "Out for Delivery" in stage_names %} checked {% endif %}>
+        <span class="checkmark"></span>
+         {% if "Out for Delivery" in stage_names %}
+    {% for stage in stage_details %}
+        {% if stage.stage == "Out for Delivery" %}
+        <div class="stage-info">
+            <br><strong>{{ stage.Branch }},{{ stage.branchlocation }}, {{ stage.Date|date:"d-m-Y" }},<br/>{{ stage.Time }},{{ stage.username }}</p>
+        </strong></div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+    </div>
+
+    <!-- Delivered Stage -->
+    <div class="step-item">
+        <label for="delivered" class="step-label">Delivered</label>
+        <input type="checkbox" class="step-checkbox" id="delivered" name="stage" value="Delivered"
+            {% if "Delivered" in stage_names %} checked {% endif %}>
+        <span class="checkmark"></span>
+         {% if "Delivered" in stage_names %}
+    {% for stage in stage_details %}
+        {% if stage.stage == "Delivered" %}
+        <div class="stage-info">
+            <br><strong>{{ stage.Branch }},{{ stage.branchlocation }}, {{ stage.Date|date:"d-m-Y" }},<br/>{{ stage.Time }},{{ stage.username }}</p>
+        </strong></div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+    </div>
+</div>
+
+    </div>
+</div>
+
+<!-- Styling -->
+<style>
+    .tracking-container {
+        margin: 15px auto;
+        max-width: 1000px;
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .tracking-header h4 {
+        text-align: center;
+        color: #007bff;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .tracking-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .step {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .step-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 14%; /* Adjust based on number of steps */
+    }
+
+    .step-label {
+        font-size: 14px;
+        color: #495057;
+        margin-bottom: 5px;
+    }
+
+    .step-checkbox {
+        position: relative;
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        accent-color: #007bff; /* Color for checked box */
+    }
+
+    .checkmark {
+        width: 100%;
+        height: 5px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+
+    /* Highlight progress bar when checkbox is checked */
+    .step-checkbox:checked + .checkmark {
+        background-color: #28a745;
+    }
+</style>
+
+<div class="row">
+    <!-- Container for the entire section with Edit Icon on top-right -->
+<div class="row">
+    <!-- Container for the entire section with a solid box and Edit Icon on top-right -->
+    <div class="col-md-12 position-relative" style="border: 1px solid #000; padding: 10px; border-radius: 5px;">
+        <!-- Edit Icon in the top-right corner -->
+        <span class="edit-icon position-absolute" style="top: 10px; right: 10px; cursor: pointer;" onclick="toggleEditSection()">&#9998; Edit</span>
+
+        <!-- Flex container to display "From" and "To" in one line -->
+        <div class="d-flex justify-content-between align-items-center">
+            <!-- Route From (Editable) -->
+            <div class="editable-row col-md-5">
+                <label for="from">From:</label>
+                <div class="static-content" id="from_display">{{ userdata.route_from }}</div>
+                <input type="text" id="from" name="from" class="form-control edit-input" value="{{ userdata.route_from }}" style="display:none;">
+            </div>
+
+            <!-- Route To (Editable) -->
+            <div class="editable-row col-md-5">
+                <label for="to">To:</label>
+                <div class="static-content" id="to_display">{{ userdata.route_to }}</div>
+                <input type="text" id="to" name="to" class="form-control edit-input" value="{{ userdata.route_to }}" style="display:none;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleEditSection() {
+        var fromDisplay = document.getElementById('from_display');
+        var fromInput = document.getElementById('from');
+        var toDisplay = document.getElementById('to_display');
+        var toInput = document.getElementById('to');
+
+        // Toggle visibility
+        if (fromDisplay.style.display === "none") {
+            fromDisplay.style.display = "block";
+            fromInput.style.display = "none";
+            toDisplay.style.display = "block";
+            toInput.style.display = "none";
+        } else {
+            fromDisplay.style.display = "none";
+            fromInput.style.display = "block";
+            toDisplay.style.display = "none";
+            toInput.style.display = "block";
+        }
+    }
+</script>
+
+</div>
+</br>
+    <div class="row g-3">
+        <div class="col-md-6">
+       <div class="position-relative" style="border: 1px solid #000; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+    <!-- Edit Icon in the top-right corner -->
+    <span class="edit-icon position-absolute" style="top: 10px; right: 10px;" onclick="toggleShipperDetailsEdit()">&#9998; Edit</span>
+
+    <!-- Shipper Details Section -->
+    <h3>Shipper Details</h3>
+
+    <!-- All Shipper Details in Read-Only Mode -->
+    <div id="shipperDetailsDisplay">
+        <p><strong>Shipper Name:</strong> <span id="senderName_display">{{ userdata.sender_name }}</span></p>
+        <p><strong>Shipper Mobile:</strong> <span id="senderMobile_display">{{ userdata.sender_mobile }}</span></p>
+        <p><strong>Shipper Address:</strong> <span id="senderAddress_display">{{ userdata.sender_address }}</span></p>
+        <p><strong>Shipper GST:</strong> <span id="senderLocation_display">{{ userdata.sender_GST }}</span></p>
+
+    </div>
+
+    <!-- All Shipper Details in Edit Mode (Initially Hidden) -->
+    <div id="shipperDetailsEdit" style="display:none;">
+        <label for="senderName">Shipper Name</label>
+        <input type="text" id="senderName" name="a1" class="form-control" value="{{ userdata.sender_name }}" required>
+
+        <label for="senderMobile">Shipper Mobile</label>
+        <input type="tel" id="senderMobile" name="a2" class="form-control" value="{{ userdata.sender_mobile }}" required>
+
+        <label for="senderAddress">Shipper Address</label>
+        <textarea type="text" id="senderAddress" name="a4" class="form-control"  required>{{ userdata.sender_address }}</textarea>
+
+        <label for="senderGST">Shipper GST</label>
+        <input type="text" id="senderGST" name="a3" class="form-control" value="{{ userdata.sender_GST}}" required>
+
+    </div>
+</div>
+           <!-- JavaScript for Toggling Shipper Details -->
+<!-- JavaScript for Toggling Shipper Details -->
+<script>
+    function toggleShipperDetailsEdit() {
+        const displayDiv = document.getElementById('shipperDetailsDisplay');
+        const editDiv = document.getElementById('shipperDetailsEdit');
+        const editIcon = document.querySelector('.edit-icon');
+
+        if (editDiv.style.display === 'none') {
+            // Switch to edit mode
+            displayDiv.style.display = 'none';
+            editDiv.style.display = 'block';
+            editIcon.innerHTML = '&#9998; Edit'; // Change icon text to Save
+        } else {
+            // Switch back to read-only mode
+            displayDiv.style.display = 'block';
+            editDiv.style.display = 'none';
+            editIcon.innerHTML = '&#9998; Edit'; // Change icon text back to Edit
+        }
+    }
+</script>
+
+<!-- Optional CSS for styling -->
+<style>
+    .edit-icon {
+        cursor: pointer;
+        font-size: 18px;
+        color: #007bff;
+        display: inline-block;
+    }
+
+    .position-relative {
+        position: relative;
+    }
+
+    .position-absolute {
+        position: absolute;
+    }
+</style>
+
+<div class="col-md-12 position-relative" style="border: 1px solid #000; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+    <!-- Edit Icon in the top-right corner -->
+    <span class="edit-icon position-absolute" style="top: 10px; right: 10px;" onclick="toggleReceiverDetailsEdit()">&#9998; Edit</span>
+
+    <!-- Receiver Details Section -->
+    <h3>Receiver Details</h3><br>
+
+    <!-- All Receiver Details in Read-Only Mode -->
+    <div id="receiverDetailsDisplay">
+        <p><strong>Receiver Name:</strong> <span id="receiverName_display">{{ userdata.receiver_name }}</span></p>
+        <p><strong>Receiver Mobile:</strong> <span id="receiverMobile_display">{{ userdata.receiver_mobile }}</span></p>
+        <p><strong>Receiver Address:</strong> <span id="receiverAddress_display">{{ userdata.receiver_address }}</span></p>
+        <p><strong>Receiver GST:</strong> <span id="receiverLocation_display">{{ userdata.receiver_GST }}</span></p>
+
+    </div>
+
+    <!-- All Receiver Details in Edit Mode (Initially Hidden) -->
+    <div id="receiverDetailsEdit" style="display:none;">
+        <label for="receiverName">Receiver Name</label>
+        <input type="text" id="receiverName" name="a5" class="form-control" value="{{ userdata.receiver_name }}" required>
+
+        <label for="receiverMobile">Receiver Mobile</label>
+        <input type="tel" id="receiverMobile" name="a6" class="form-control" value="{{ userdata.receiver_mobile }}" required>
+
+        <label for="receiverAddress">Receiver Address</label>
+        <textarea type="text" id="receiverAddress" name="a8" class="form-control"  required> {{ userdata.receiver_address }}</textarea>
+
+        <label for="receiverGST">Receiver GST</label>
+        <input type="text" id="receiverGST" name="a7" class="form-control" value="{{ userdata.receiver_GST }}" required>
+
+    </div>
+</div>
+
+<!-- JavaScript for Toggling Receiver Details -->
+<script>
+    function toggleReceiverDetailsEdit() {
+        const displayDiv = document.getElementById('receiverDetailsDisplay');
+        const editDiv = document.getElementById('receiverDetailsEdit');
+        const editIcon = document.querySelector('.edit-icon');
+
+        if (editDiv.style.display === 'none') {
+            // Switch to edit mode
+            displayDiv.style.display = 'none';
+            editDiv.style.display = 'block';
+            editIcon.innerHTML = '&#9998; Edit'; // Change icon text to Save
+        } else {
+            // Switch back to read-only mode
+            displayDiv.style.display = 'block';
+            editDiv.style.display = 'none';
+            editIcon.innerHTML = '&#9998; Edit'; // Change icon text back to Edit
+        }
+    }
+</script>
+
+<!-- Optional CSS for styling (if not already included) -->
+<style>
+    .edit-icon {
+        cursor: pointer;
+        font-size: 18px;
+        color: #007bff;
+        display: inline-block;
+    }
+
+    .position-relative {
+        position: relative;
+    }
+
+    .position-absolute {
+        position: absolute;
+    }
+</style>
+
+
+</div>
+
+
+
+       <div class="col-md-6 position-relative" style="border: 1px solid #000; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+    <!-- Edit Icon in the top-right corner -->
+    <span class="edit-icon position-absolute" style="top: 10px; right: 10px;" onclick="toggleChargeDetailsEdit()">&#9998; Edit</span>
+
+    <!-- Charge Details Section -->
+    <h3>Charge Details:</h3>
+
+    <!-- All Charge Details in Read-Only Mode -->
+    <div id="chargeDetailsDisplay">
+        <p><strong>Category:</strong> <span id="category_display">{{ userdata.category }}</span></p>
+        <p><strong>Weight:</strong> <span id="weight_display">{{ userdata.weight }}</span></p>
+        <p><strong>No. Of Packages:</strong> <span id="packages_display">{{ userdata.pieces }}</span></p>
+        <p><strong>Freight:</strong> <span id="freight_display">{{ userdata.freight }}</span></p>
+        <p><strong>Hamali Charge:</strong> <span id="hamali_display">{{ userdata.hamali }}</span></p>
+        <p><strong>Door Charge:</strong> <span id="door_charge_display">{{ userdata.door_charge }}</span></p>
+        <p><strong>CGST:</strong> <span id="cgst_display">{{ userdata.cgst }}</span></p>
+        <p><strong>SGST:</strong> <span id="sgst_display">{{ userdata.sgst }}</span></p>
+        <p><strong>Total:</strong> <span id="total_display">{{ userdata.total_cost }}</span></p>
+        <p><strong>Invoice Value:</strong> <span id="prod_price">{{ userdata.prod_price }}</span></p>
+        <p><strong>E-Way Bill:</strong> <span id="bill_no">{{ userdata.eway_bill }}</span></p>
+        <p><strong>Pay status:</strong> <span id="payment">{{ userdata.pay_status }}</span></p>
+        <p><strong>Remark:</strong> <span id="remark">{{ userdata.remark }}</span></p>
+    </div>
+
+    <!-- All Charge Details in Edit Mode (Initially Hidden) -->
+    <div id="chargeDetailsEdit" style="display:none;">
+        <label>Category</label>
+        <select id="cat" name="category" class="form-control" onchange="fetchCategoryDetails()">
+            <option value="{{ userdata.category }}">{{ userdata.category }}</option>
+            {% for cat in cat %}
+                <option value="{{ cat.prefix }}">{{ cat.cat_name }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Weight</label>
+        <input type="text" class="form-control" id="weight" value="{{ userdata.weight }}" name="weight" required>
+
+        <label>No. Of Packages</label>
+        <input type="text" class="form-control" id="packages" value="{{ userdata.pieces }}" name="packages" required>
+
+        <label for="freight">Freight</label>
+        <input type="text" id="freight" name="freight" value="{{ userdata.freight }}" class="form-control" required>
+
+        <label for="hamali">Hamali Charge</label>
+        <input type="text" id="hamali" name="hamali" value="{{ userdata.hamali }}" class="form-control">
+
+        <label for="door_charge">Door Charge</label>
+        <input id="door_charge" name="door_charge" value="{{ userdata.door_charge }}" class="form-control">
+
+        <input type="hidden" id="gst" name="gst" value="5" class="form-control">
+
+        <label for="cgst">CGST</label>
+        <input id="cgst" name="cgst" value="{{ userdata.cgst }}" class="form-control">
+
+        <label for="sgst">SGST</label>
+        <input id="sgst" name="sgst" value="{{ userdata.sgst }}" class="form-control">
+
+        <label for="total">Total</label>
+        <input id="total" name="cost" value="{{ userdata.total_cost }}" class="form-control" required>
+
+        <label>Invoice Value</label>
+        <input type="text" class="form-control" value="{{ userdata.prod_price }}" name="prod_price" required>
+
+        <label>E-Way Bill No</label>
+        <input type="text" class="form-control" value="{{ userdata.eway_bill }}" name="ewaybill_no">
+
+        <label>Payment Mode</label>
+        <select name="payment" class="form-control">
+            <option value="{{ userdata.pay_status }}">{{ userdata.pay_status }}</option>
+            <option value="Paid">Paid</option>
+            <option value="Shipper A/C">Shipper Account</option>
+            <option value="Receiver A/C">Receiver Account</option>
+            <option value="To Pay">To Pay</option>
+        </select>
+
+        <label>Remark</label>
+        <input type="text" value="{{ userdata.remark }}" class="form-control" name="remark" required>
+    </div>
+</div>
+
+<!-- JavaScript for Toggling Charge Details -->
+<script>
+    function toggleChargeDetailsEdit() {
+        const displayDiv = document.getElementById('chargeDetailsDisplay');
+        const editDiv = document.getElementById('chargeDetailsEdit');
+        const editIcon = document.querySelector('.edit-icon');
+
+        if (editDiv.style.display === 'none') {
+            // Switch to edit mode
+            displayDiv.style.display = 'none';
+            editDiv.style.display = 'block';
+            editIcon.innerHTML = '&#9998; Edit'; // Change icon text to Save
+        } else {
+            // Switch back to read-only mode
+            displayDiv.style.display = 'block';
+            editDiv.style.display = 'none';
+            editIcon.innerHTML = '&#9998; Edit'; // Change icon text back to Edit
+        }
+    }
+</script>
+
+<!-- Optional CSS for styling -->
+<style>
+    .edit-icon {
+        cursor: pointer;
+        font-size: 18px;
+        color: #007bff;
+        display: inline-block;
+    }
+
+    .position-relative {
+        position: relative;
+    }
+
+    .position-absolute {
+        position: absolute;
+    }
+</style>
+
+
+    <div class="row g-3">
+
+        <div class="col-md-6">
+        <div class="form-group">
+
+
+
+
+        <label>Comment</label>
+        <input type="text" class="form-control" id="commit" name="commit">
+    </div><br/>
+             <button type="submit" class="btn btn-primary col-md-3">Submit</button>
+</div>
+
+
+   </div>
+    </div>
+        </form>
+
+	</div>
+
+    </div><be/><br/>
+
+    <div class="container">
+        <h1>Consignment History</h1>
+        <table class="table table-striped table-bordered">
+            <tr class="table-dark">
+                <th>Order No.</th>
+                <th>Date & Time</th>
+                <th>Shipper Name</th>
+                <th>Receiver Name</th>
+                <th>Category</th>
+                <th>No. of Pieces</th>
+                <th>Total cost</th>
+                <th>Comment</th>
+                <th>Added By</th>
+            </tr>
+            {% for history in history %}
+            <tr>
+                <td>{{ history.track_id }}</td>
+                <td>{{ history.date }} & {{ history.time }}</td>
+                <td>{{ history.sender_name }}</td>
+                <td>{{ history.receiver_name }}</td>
+                <td>{{ history.category }}</td>
+                <td>{{ history.pieces }}</td>
+                <td>{{ history.total_cost }}</td>
+                <td>{{ history.commit }}</td>
+                <td>{{ history.name }}</td>
+            </tr>
+
+            {% endfor %}
+        </table>
+    </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const freightField = document.getElementById('freight');
+    const hamaliField = document.getElementById('hamali');
+    const doorChargeField = document.getElementById('door_charge');
+    const totalField = document.getElementById('total');
+
+    // Function to calculate the total cost
+    function calculateTotal() {
+        const freight = parseFloat(freightField.value) || 0;
+        const hamali = parseFloat(hamaliField.value) || 0;
+        const doorCharge = parseFloat(doorChargeField.value) || 0;
+
+        // Calculate the total
+        const total = freight + hamali + doorCharge;
+        totalField.value = total.toFixed(2);  // Update total field
+    }
+
+    // Fetch category details and update freight
+    function fetchCategoryDetails() {
+        const selectedCategory = document.getElementById('cat').value;
+
+        if (selectedCategory) {
+            fetch(`/get_category_details/?cat_name=${selectedCategory}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.freight) {
+                        const freightValue = parseFloat(data.freight);
+                        freightField.value = freightValue.toFixed(2);
+                    } else {
+                        freightField.value = 0;  // Reset if no freight value found
+                    }
+
+                    // Trigger CGST, SGST, and total calculation after fetching the freight value
+                    calculateTax();  // Calculate taxes
+                    calculateTotal();  // Calculate total cost
+                })
+                .catch(error => {
+                    console.error('Error fetching category details:', error);
+                });
+        }
+    }
+
+    // Function to calculate CGST and SGST
+    function calculateTax() {
+        const freight = parseFloat(freightField.value) || 0;
+        const gst = 5;  // Fixed GST percentage (5%)
+
+        const cgst = (freight * 2.5) / 100;
+        const sgst = (freight * 2.5) / 100;
+
+        document.getElementById("cgst").value = cgst.toFixed(2);
+        document.getElementById("sgst").value = sgst.toFixed(2);
+    }
+
+    // Event listeners to recalculate total when inputs change
+    freightField.addEventListener('input', function() {
+        calculateTax();  // Update taxes when freight changes
+        calculateTotal();  // Update total when freight changes
+    });
+    hamaliField.addEventListener('input', calculateTotal);
+    doorChargeField.addEventListener('input', calculateTotal);
+
+    // Event listener to trigger category details fetch on category change
+    document.getElementById('cat').addEventListener('change', fetchCategoryDetails);
+});
+</script>
+
+<!-- Add JavaScript at the end of your body or in a script file -->
+<script>
+    document.getElementById('payment').addEventListener('change', function() {
+        var paymentMode = this.value;
+        var additionalOptions = document.getElementById('additional-options');
+
+        if (paymentMode === 'Paid') {
+            additionalOptions.style.display = 'block';
+        } else {
+            additionalOptions.style.display = 'none';
+        }
+    });
+
+function validateForm() {
+    const billNo = document.getElementById('bill_no');
+    if (billNo && billNo.style.display !== 'none' && !billNo.value) {
+        billNo.setCustomValidity('E-Way Bill No is required.');
+    } else {
+        billNo.setCustomValidity('');
+    }
+}
+
+document.querySelector('form').addEventListener('submit', validateForm);
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const prodPriceField = document.getElementById('prod_price');
+    const billNoContainer = document.getElementById('billNoContainer');
+
+    function checkPrice() {
+    const price = parseFloat(prodPriceField.value) || 0;
+    if (price > 49999) {
+        billNoContainer.style.display = 'block';
+    } else {
+        billNoContainer.style.display = 'none';
+        document.getElementById('bill_no').value = ''; // Clear value when hidden
+    }
+}
+
+    // Attach event listener
+    prodPriceField.addEventListener('input', checkPrice);
+
+    // Initial check on page load
+    checkPrice();
+});
+
+
+
+
+
+
+function showDatalist() {
+    const input = document.getElementById('vehicalno');
+    const datalist = document.getElementById('vehicle_numbers');
+
+    if (input.value.length >= 2) {
+        fetch(`/get_vehicle_numbers?query=${encodeURIComponent(input.value)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched data:', data); // Debugging: Check the data in the console
+                datalist.innerHTML = ''; // Clear previous options
+
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(number => {
+                        const option = document.createElement('option');
+                        option.value = number;
+                        datalist.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = 'No results';
+                    datalist.appendChild(option);
+                }
+            })
+            .catch(error => console.error('Error fetching vehicle numbers:', error));
+    } else {
+        datalist.innerHTML = ''; // Clear the datalist if fewer than 2 characters
+    }
+}
+
+function showConsignorDatalist() {
+    const input = document.getElementById('senderName');
+    const datalist = document.getElementById('consignor_name');
+
+    if (input.value.length >= 2) {
+        fetch(`/get_consignor_name?query=${encodeURIComponent(input.value)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched data:', data); // Debugging: Check the data in the console
+                datalist.innerHTML = ''; // Clear previous options
+
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(number => {
+                        const option = document.createElement('option');
+                        option.value = number;
+                        datalist.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = 'No results';
+                    datalist.appendChild(option);
+                }
+            })
+            .catch(error => console.error('Error fetching vehicle numbers:', error));
+    } else {
+        datalist.innerHTML = ''; // Clear the datalist if fewer than 2 characters
+    }
+}
+
+function fetchSenderDetails() {
+    const senderName = document.getElementById('senderName').value;
+
+    if (senderName) {
+        fetch(`/get_sender_details?name=${encodeURIComponent(senderName)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched sender details:', data);
+
+                // Only populate the fields if data exists; otherwise, leave the fields as they are
+                if (data) {
+                    if (data.sender_mobile) {
+                        document.getElementById('senderMobile').value = data.sender_mobile;
+                    }
+                    if (data.sender_GST) {
+                        document.getElementById('sendergst').value = data.sender_GST;
+                    }
+                    if (data.sender_address) {
+                        document.getElementById('senderAddress').value = data.sender_address;
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching sender details:', error));
+    }
+}
+
+
+
+function fetchSenderNumberDetails() {
+    const senderMobile = document.getElementById('senderMobile').value;
+
+    if (senderMobile) {
+        fetch(`/get_sender_number_details?name=${encodeURIComponent(senderMobile)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched sender details:', data);
+
+                // Only populate the fields if data exists; otherwise, leave the fields as they are
+                if (data) {
+                    if (data.sender_name) {
+                        document.getElementById('senderName').value = data.sender_name;
+                    }
+                    if (data.sender_GST) {
+                        document.getElementById('sendergst').value = data.sender_GST;
+                    }
+                    if (data.sender_address) {
+                        document.getElementById('senderAddress').value = data.sender_address;
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching sender details:', error));
+    }
+}
+
+
+function showConsignorNumberDatalist() {
+    const input = document.getElementById('senderMobile');
+    const datalist = document.getElementById('consignor_number');
+
+    if (input.value.length >= 2) {
+        fetch(`/get_consignor_number?query=${encodeURIComponent(input.value)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched data:', data); // Debugging: Check the data in the console
+                datalist.innerHTML = ''; // Clear previous options
+
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(number => {
+                        const option = document.createElement('option');
+                        option.value = number;
+                        datalist.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = 'No results';
+                    datalist.appendChild(option);
+                }
+            })
+            .catch(error => console.error('Error fetching vehicle numbers:', error));
+    } else {
+        datalist.innerHTML = ''; // Clear the datalist if fewer than 2 characters
+    }
+}
+
+
+
+function fetchreceiverNumberDetails() {
+    const receiverMobile = document.getElementById('receiverMobile').value;
+
+    if (receiverMobile) {
+        fetch(`/get_receiver_number_details?name=${encodeURIComponent(receiverMobile)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched receiver details:', data); // Debugging: Check the data in the console
+
+                // Only populate the fields if data exists; otherwise, leave the fields as they are
+                if (data) {
+                    if (data.receiver_name) {
+                        document.getElementById('receiverName').value = data.receiver_name;
+                    }
+                    if (data.receiver_GST) {
+                        document.getElementById('receivergst').value = data.receiver_GST;
+                    }
+                    if (data.receiver_address) {
+                        document.getElementById('receiverAddress').value = data.receiver_address;
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching receiver details:', error));
+    }
+}
+
+
+
+function showConsigneeNumberDatalist() {
+    const input = document.getElementById('receiverMobile');
+    const datalist = document.getElementById('consignee_number');
+
+    if (input.value.length >= 2) {
+        fetch(`/get_consignee_number?query=${encodeURIComponent(input.value)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched data:', data); // Debugging: Check the data in the console
+                datalist.innerHTML = ''; // Clear previous options
+
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(number => {
+                        const option = document.createElement('option');
+                        option.value = number;
+                        datalist.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = 'No results';
+                    datalist.appendChild(option);
+                }
+            })
+            .catch(error => console.error('Error fetching vehicle numbers:', error));
+    } else {
+        datalist.innerHTML = ''; // Clear the datalist if fewer than 2 characters
+    }
+}
+
+
+
+function showConsigneeDatalist() {
+    const input = document.getElementById('receiverName');
+    const datalist = document.getElementById('consignee_name');
+
+    if (input.value.length >= 2) {
+        fetch(`/get_consignee_name?query=${encodeURIComponent(input.value)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched data:', data); // Debugging: Check the data in the console
+                datalist.innerHTML = ''; // Clear previous options
+
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(number => {
+                        const option = document.createElement('option');
+                        option.value = number;
+                        datalist.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = 'No results';
+                    datalist.appendChild(option);
+                }
+            })
+            .catch(error => console.error('Error fetching vehicle numbers:', error));
+    } else {
+        datalist.innerHTML = ''; // Clear the datalist if fewer than 2 characters
+    }
+}
+function fetchRecDetails() {
+    const receiverName = document.getElementById('receiverName').value;
+
+    if (receiverName) {
+        fetch(`/get_rec_details?name=${encodeURIComponent(receiverName)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched receiver details:', data); // Debugging: Check the data in the console
+
+                // Only populate the fields if data exists; otherwise, leave the fields as they are
+                if (data) {
+                    if (data.receiver_mobile) {
+                        document.getElementById('receiverMobile').value = data.receiver_mobile;
+                    }
+                    if (data.receiver_GST) {
+                        document.getElementById('receivergst').value = data.receiver_GST;
+                    }
+                    if (data.receiver_address) {
+                        document.getElementById('receiverAddress').value = data.receiver_address;
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching receiver details:', error));
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const commissionInput = document.getElementById('commission');
+    const grandTotalInput = document.getElementById('g_total');
+    const totalField = document.getElementById('total');
+
+    function calculateGrandTotal() {
+        // Get the total value (assuming it should be fetched from the 'total' input)
+        const total = parseFloat(totalField.value) || 0;
+        const commission = parseFloat(commissionInput.value) || 0;
+
+        // Calculate the grand total
+        const grandTotal = total - commission;
+
+        // Ensure grand total doesn't go negative
+        grandTotalInput.value = Math.max(grandTotal, 0).toFixed(2);
+    }
+
+    // Attach event listeners
+    commissionInput.addEventListener('input', calculateGrandTotal);
+    totalField.addEventListener('input', calculateGrandTotal);
+
+    // Initialize grand total on page load
+    calculateGrandTotal();
+});
+
+</script>
+
+{% if messages %}
+    <script>
+        window.onload = function() {
+            {% for message in messages %}
+                alert("{{ message }}");
+            {% endfor %}
+        };
+    </script>
+{% endif %}
+
+ <div class="row mt-5">
+          <div class="col-12 text-center">
+            <!--
+              **==========
+              NOTE:
+              Please don't remove this copyright link unless you buy the license here https://untree.co/license/
+              **==========
+            -->
+          </div>
+        </div>
+      </div>
+      <!-- /.container -->
+    </div>
+    <!-- /.site-footer -->
+
+    <!-- Preloader -->
+    <div id="overlayer"></div>
+    <div class="loader">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/tiny-slider.js' %}"></script>
+    <script src="{% static 'js/aos.js' %}"></script>
+    <script src="{% static 'js/navbar.js' %}"></script>
+    <script src="{% static 'js/counter.js' %}"></script>
+    <script src="{% static 'js/custom.js' %}"></script>
+  </body>
+</html>

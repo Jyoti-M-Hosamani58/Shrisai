@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Branch Consignment</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Basic styles for the modal */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Green highlight for input */
+        .highlight {
+            border: 2px solid green;
+            background-color: #e0ffe0; /* Light green background */
+        }
+    </style>
+</head>
+<body>
+    <h1>Branch Consignment</h1>
+
+    <!-- Input for barcode scanning -->
+    <input type="text" id="barcode-input" placeholder="Scan Barcode" autofocus>
+    <button id="add-button" style="display: none;">Add</button>
+
+    <!-- Modal for displaying consignment details -->
+    <div id="consignment-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Consignment Details</h2>
+            <p><strong>Track ID:</strong> <span id="track-id"></span></p>
+            <p><strong>Consignment ID:</strong> <span id="consignment-id"></span></p>
+            <p><strong>Sender Name:</strong> <span id="sender-name"></span></p>
+            <p><strong>Receiver Name:</strong> <span id="receiver-name"></span></p>
+            <p><strong>Total Cost:</strong> <span id="total-cost"></span></p>
+            <button id="ok-button">OK</button>
+        </div>
+    </div>
+
+    <!-- Display for other details -->
+    <div id="display-details">
+        <h2>Consignment Information</h2>
+        <p><strong>Consignment ID:</strong> <span id="display-consignment-id"></span></p>
+        <p><strong>Sender Name:</strong> <span id="display-sender-name"></span></p>
+        <p><strong>Receiver Name:</strong> <span id="display-receiver-name"></span></p>
+        <p><strong>Total Cost:</strong> <span id="display-total-cost"></span></p>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Use a timer to handle the input delay from the scanner
+            let inputTimeout;
+
+            $('#barcode-input').on('input', function() {
+                const trackId = $(this).val();
+
+                // Clear previous timeout
+                clearTimeout(inputTimeout);
+
+                // Set a new timeout to handle input delay
+                inputTimeout = setTimeout(function() {
+                    if (trackId) {
+                        $.get(`/fetch-consignment-details/?track_id=${trackId}`, function(response) {
+                            if (response.success) {
+                                // Highlight the input field
+                                $('#barcode-input').addClass('highlight');
+
+                                // Fill in modal with response data
+                                $('#track-id').text(response.data.track_id);
+                                $('#consignment-id').text(response.data.Consignment_id);
+                                $('#sender-name').text(response.data.sender_name);
+                                $('#receiver-name').text(response.data.receiver_name);
+                                $('#total-cost').text(response.data.total_cost);
+
+                                // Show the modal
+                                $('#consignment-modal').show();
+                                $('#add-button').show();
+                            } else {
+                                alert(response.error);
+                            }
+                        }).fail(function(jqXHR) {
+                            alert(jqXHR.responseJSON.error);
+                        });
+                    }
+                }, 500); // Adjust this delay as needed (in milliseconds)
+            });
+
+            // Close modal on clicking close button
+            $('.close').on('click', function() {
+                $('#consignment-modal').hide();
+                $('#barcode-input').val('').removeClass('highlight'); // Clear input and remove highlight
+                $('#add-button').hide(); // Hide the add button
+            });
+
+            // Close modal when clicking outside of it
+            $(window).on('click', function(event) {
+                if ($(event.target).is('#consignment-modal')) {
+                    $('#consignment-modal').hide();
+                    $('#barcode-input').val('').removeClass('highlight'); // Clear input and remove highlight
+                    $('#add-button').hide(); // Hide the add button
+                }
+            });
+
+            // Handle OK button click
+            $('#ok-button').on('click', function() {
+                // Display details on the main screen
+                $('#display-consignment-id').text($('#consignment-id').text());
+                $('#display-sender-name').text($('#sender-name').text());
+                $('#display-receiver-name').text($('#receiver-name').text());
+                $('#display-total-cost').text($('#total-cost').text());
+
+                // Hide the modal
+                $('#consignment-modal').hide();
+                $('#barcode-input').val('').removeClass('highlight'); // Clear the input
+                $('#add-button').hide(); // Hide the add button
+            });
+
+            $('#add-button').on('click', function() {
+                alert('Add button clicked. Implement add logic here.');
+            });
+        });
+    </script>
+</body>
+</html>

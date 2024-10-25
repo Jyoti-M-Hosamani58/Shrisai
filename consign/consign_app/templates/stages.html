@@ -1,0 +1,354 @@
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Untree.co" />
+    <link rel="shortcut icon" href="{% static 'favicon.png' %}" />
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="bootstrap, bootstrap5" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'fonts/flaticon/font/flaticon.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'css/tiny-slider.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/aos.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <title>
+Consignment    </title>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+
+
+      <style>
+
+            .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      table {
+        width: 100%;
+        min-width: 600px;
+      }
+
+      .barcode-list {
+        height: 150px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 5px;
+        margin-top: 5px;
+      }
+
+      .error-message {
+        color: red;
+        font-weight: bold;
+        display: none;
+      }
+
+        /* CSS for horizontal scrolling */
+        .table-container {
+            overflow-x: auto; /* Enable horizontal scrolling */
+            -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+        }
+
+        table {
+            width: 100%; /* Ensure the table takes full width */
+            min-width: 600px; /* Adjust based on the expected minimum width */
+        }
+    </style>
+            <style>
+        /* CSS for horizontal scrolling */
+        .table-container {
+            overflow-x: auto; /* Enable horizontal scrolling */
+            -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+        }
+
+        table {
+            width: 100%; /* Ensure the table takes full width */
+            min-width: 600px; /* Adjust based on the expected minimum width */
+        }
+    </style>
+      <style>
+  .checkbox-group {
+    display: flex; /* Use flexbox for layout */
+    flex-wrap: wrap; /* Allow wrapping of items */
+    gap: 20px; /* Space between items */
+  }
+
+  .checkbox-item {
+    text-align: center; /* Center align label and checkbox */
+    width: 120px; /* Set a fixed width for each item */
+  }
+
+  .form-check-label {
+    font-weight: bold; /* Make the label bold */
+    margin-bottom: 5px; /* Space between label and checkbox */
+  }
+
+  .form-check-input {
+    transform: scale(1.2); /* Increase checkbox size */
+  }
+</style>
+  </head>
+  <body>
+    <div class="site-mobile-menu site-navbar-target">
+      <div class="site-mobile-menu-header">
+        <div class="site-mobile-menu-close">
+          <span class="icofont-close js-menu-toggle"></span>
+        </div>
+      </div>
+      <div class="site-mobile-menu-body"></div>
+    </div>
+
+    {% include 'branch_nav.html' %}
+    <br/><br/><br/>
+      <div class="container">
+        <div class="row justify-content-center align-items-center">
+          <div class="col-lg-9 text-center mt-5">
+            <h1 class="heading" data-aos="fade-up"> Orders List</h1>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+	<!-- end header -->
+
+<div class="background-container"></div>
+<div class="content">
+<form method="post" action="{% url 'stages' %}" onsubmit="return validateForm()">
+    {% csrf_token %}
+    <div class="row mb-3">
+        <!-- Date inputs -->
+        <div class="col-md-3">
+            <label for="from_date">From Date</label>
+            <input type="date" class="form-control" id="from_date" name="from_date" />
+        </div>
+        <div class="col-md-3">
+            <label for="to_date">To Date</label>
+            <input type="date" class="form-control" id="to_date" name="to_date" />
+        </div>
+
+        <!-- Barcode input field -->
+        <div class="col-md-3">
+            <label>Barcode</label>
+            <input type="text" class="form-control" id="orderno" placeholder="Scan or Enter Barcode" autocomplete="off">
+        </div>
+        <div class="col-md-3">
+            <label>&nbsp;</label>
+            <button type="submit" class="form-control btn btn-primary">Search</button>
+        </div>
+
+        <!-- Hidden input to store the list of barcodes -->
+        <input type="hidden" id="hidden-barcode-list" name="orderno">
+
+        <!-- Display the barcode list -->
+        <div class="col-md-6">
+            <div class="barcode-list" id="barcode-list" name="barcode_list"></div>
+        </div>
+    </div>
+
+
+    <br/>
+
+    <button type="submit" class="btn btn-primary btn-sm col-md-3">Submit</button>
+
+    <p class="error-message" id="error-message" style="display: none;">Please add at least one barcode.</p>
+</form>
+<br/>
+<!-- Order List Table -->
+<div class="container">
+
+    <!-- Form for submitting stage and consignment data -->
+    <form method="POST" action="{% url 'save_stage' %}">
+        {% csrf_token %}
+
+        <!-- Checkboxes for stages -->
+        <div class="checkbox-group mb-3">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="picked" name="picked" value="Picked">
+                <label class="form-check-label" for="picked">Picked</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="sd" name="sd" value="Staged at SD">
+                <label class="form-check-label" for="sd">Staged at SD</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="transit" name="transit" value="In Transit">
+                <label class="form-check-label" for="transit">In Transit</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="dd" name="dd" value="Staged at DD">
+                <label class="form-check-label" for="dd">Staged at DD</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="out" name="out" value="Out for Delivery">
+                <label class="form-check-label" for="out">Out for Delivery</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="delivered" name="delivered" value="Delivered">
+                <label class="form-check-label" for="delivered">Delivered</label>
+            </div>             <button type="submit" class="btn btn-primary mt-3">Save Stages</button>
+
+        </div>
+
+        <!-- Table for consignments -->
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th></th>
+                        <th>Date</th>
+                        <th>Order No</th>
+                        <th>Barcode No.</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Category</th>
+                        <th>No. of Articles</th>
+                        <th>Shipper Name</th>
+                        <th>Receiver Name</th>
+                        <th>Revenue</th>
+                        <th>Pay Status</th>
+                        <th>Remark</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for details in consignments %}
+                    <tr>
+                        <td><input type="checkbox" checked name="selected_ids" value="{{ details.track_id }}" /></td>
+                        <td>{{ details.date }}</td>
+                        <td>{{ details.track_id }}</td>
+                        <td>{{ details.barcode_number }}</td>
+                        <td>{{ details.route_from }}</td>
+                        <td>{{ details.route_to }}</td>
+                        <td>{{ details.category }}</td>
+                        <td>{{ details.pieces }}</td>
+                        <td>{{ details.sender_name }}</td>
+                        <td>{{ details.receiver_name }}</td>
+                        <td>{{ details.total_cost }}</td>
+                        <td>{{ details.pay_status }}</td>
+                        <td>{{ details.remark }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Submit Button -->
+    </form>
+</div>
+    {% if messages %}
+    <script>
+        window.onload = function() {
+            {% for message in messages %}
+                alert("{{ message }}");
+            {% endfor %}
+        };
+    </script>
+{% endif %}
+
+
+<script>
+let barcodes = [];
+
+// Prevent default form submission
+document.querySelector('form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the form from submitting and refreshing the page
+
+    if (validateForm()) {
+        // Proceed with form submission logic
+        console.log("Form is ready to submit with barcodes:", barcodes);
+        // Here you can add your logic to send data to the server if needed
+        this.submit(); // Submit the form after validation (optional)
+    }
+});
+
+// Handle input changes and check for complete barcode
+document.getElementById('orderno').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') { // Check if the Enter key is pressed
+        const input = event.target;
+        const barcodeString = input.value.trim();
+
+        // Check if there is a valid barcode entered
+        if (barcodeString && !barcodes.includes(barcodeString)) {
+            barcodes.push(barcodeString); // Add the barcode to the list
+            input.value = ''; // Clear the input field after barcode is added
+
+            // Update the barcode list display and hidden field
+            updateBarcodeList();
+        }
+
+        event.preventDefault(); // Prevent form submission on Enter key
+    }
+});
+
+function updateBarcodeList() {
+    let barcodeListContainer = document.getElementById('barcode-list');
+    barcodeListContainer.innerHTML = barcodes.map((barcode) => `<div>${barcode}</div>`).join('');
+    barcodeListContainer.style.display = barcodes.length ? 'block' : 'none'; // Show/hide the list
+
+    // Update the hidden input field with the barcodes joined as a comma-separated string
+    document.getElementById('hidden-barcode-list').value = barcodes.join(',');
+
+    console.log(`Barcodes added to list: ${barcodes}`); // Debugging line
+}
+
+// Validation function
+function validateForm() {
+    if (barcodes.length === 0) {
+        document.getElementById('error-message').style.display = 'block';
+        return false; // Prevent form submission
+    }
+    document.getElementById('error-message').style.display = 'none'; // Hide error message if validation passes
+    return true; // Allow form submission
+}
+
+</script>
+
+ <div class="row mt-5">
+          <div class="col-12 text-center">
+            <!--
+              **==========
+              NOTE:
+              Please don't remove this copyright link unless you buy the license here https://untree.co/license/
+              **==========
+            -->
+
+
+          </div>
+        </div>
+      </div>
+      <!-- /.container -->
+    </div>
+    <!-- /.site-footer -->
+
+    <!-- Preloader -->
+    <div id="overlayer"></div>
+    <div class="loader">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/tiny-slider.js' %}"></script>
+    <script src="{% static 'js/aos.js' %}"></script>
+    <script src="{% static 'js/navbar.js' %}"></script>
+    <script src="{% static 'js/counter.js' %}"></script>
+    <script src="{% static 'js/custom.js' %}"></script>
+  </body>
+</html>

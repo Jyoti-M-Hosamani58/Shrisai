@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Untree.co" />
+    <link rel="shortcut icon" href="{% static 'favicon.png' %}" />
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="bootstrap, bootstrap5" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'fonts/flaticon/font/flaticon.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'css/tiny-slider.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/aos.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <title>Consignment</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+
+
+    <style>
+        /* CSS for horizontal scrolling */
+        .table-container {
+            overflow-x: auto; /* Enable horizontal scrolling */
+            -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+        }
+
+        table {
+            width: 100%; /* Ensure the table takes full width */
+            min-width: 600px; /* Adjust based on the expected minimum width */
+        }
+    </style>
+
+</head>
+<body>
+    <div class="site-mobile-menu site-navbar-target">
+        <div class="site-mobile-menu-header">
+            <div class="site-mobile-menu-close">
+                <span class="icofont-close js-menu-toggle"></span>
+            </div>
+        </div>
+        <div class="site-mobile-menu-body"></div>
+    </div>
+
+    {% include 'branch_nav.html' %}
+
+  <br><br><br>
+
+      <div class="container">
+        <div class="row justify-content-center align-items-center">
+          <div class="col-lg-9 text-center mt-5">
+            <h1 class="heading" data-aos="fade-up">  Consignment DashBoard</h1>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+	<!-- end header -->
+
+        <form method="post" action="{% url 'branch_dashboard' %}">
+        {% csrf_token %}
+    <div class="row">
+         <div class="col-md-3">
+            <label> Date</label>
+            <input type="date" class="form-control" id="date" name="date" >
+        </div>
+
+
+      <div class="col-md-3">
+        <label></label>
+<button type="submit" class="form-control btn-primary">Search</button>
+      </div>
+    </div>
+    </form>
+<!-- Add custom CSS -->
+
+<!-- Add custom CSS -->
+<style>
+  .dashboard-summary {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+
+  .dashboard-summary h3 {
+    color: #007bff;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+
+  .dashboard-summary p {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #343a40;
+    margin-bottom: 15px;
+  }
+
+  .stage-list {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  .stage-list li {
+    background-color: #e9ecef;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  .stage-list li strong {
+    color: #007bff;
+  }
+
+  .untracked-consignments {
+    color: #dc3545;
+    font-weight: 600;
+    margin-top: 20px;
+  }
+</style>
+
+<!-- Dashboard Summary Content -->
+    <br/>
+<div class="dashboard-summary">
+  <p>Total Consignments: <strong>{{ total_consignments }}</strong></p>
+  <p class="untracked-consignments">Pending Consignments: <strong>{{ untracked_consignments }}</strong></p>
+
+  <h3>Stage-wise Consignment Counts</h3>
+  <ul class="stage-list">
+    {% for stage, count in stage_counts.items %}
+      <li>{{ stage }}: <strong>{{ count }}</strong></li>
+    {% endfor %}
+  </ul>
+
+</div>
+
+
+
+<div class="no-print">
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+            </div>
+        </div>
+        <div id="overlayer"></div>
+        <div class="loader">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'js/tiny-slider.js' %}"></script>
+        <script src="{% static 'js/aos.js' %}"></script>
+        <script src="{% static 'js/navbar.js' %}"></script>
+        <script src="{% static 'js/counter.js' %}"></script>
+        <script src="{% static 'js/custom.js' %}"></script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan Barcode</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Scan Barcode</h1>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="scanned_barcode" placeholder="Scan barcode here" required autofocus>
+        <button type="submit">Submit</button>
+    </form>
+
+    {% if consignment_details %}
+        <h2>Decoded Barcode Details</h2>
+        <table>
+            <tr>
+                <th>Track ID</th>
+                <th>Consignment ID</th>
+                <th>Sender Name</th>
+                <th>Receiver Name</th>
+                <th>Total Cost</th>
+            </tr>
+            <tr>
+                <td>{{ consignment_details.track_id }}</td>
+                <td>{{ consignment_details.consignment_id }}</td>
+                <td>{{ consignment_details.sender_name }}</td>
+                <td>{{ consignment_details.receiver_name }}</td>
+                <td>{{ consignment_details.total_cost }}</td>
+            </tr>
+        </table>
+    {% elif consignment_details is not None %}
+        <p>No matching consignment found.</p>
+    {% endif %}
+</body>
+</html>

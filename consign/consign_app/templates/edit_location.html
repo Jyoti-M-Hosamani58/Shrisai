@@ -1,0 +1,23 @@
+<!-- templates/edit_category.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Category</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Location</h1>
+        <form action="{% url 'edit_location' location.id %}" method="post">
+            {% csrf_token %}
+            <div class="col-md-4">
+                <label for="location">Location</label>
+                <input type="text" class="form-control" id="location" name="location" value="{{ location.location }}" required>
+            </div><br/>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+</body>
+</html>

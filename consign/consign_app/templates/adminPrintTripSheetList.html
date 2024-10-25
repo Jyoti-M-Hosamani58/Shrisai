@@ -1,0 +1,224 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Untree.co" />
+    <link rel="shortcut icon" href="{% static 'favicon.png' %}" />
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="bootstrap, bootstrap5" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'fonts/flaticon/font/flaticon.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'css/tiny-slider.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/aos.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <title>Consignment</title>
+    <style>
+        table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+        table, th, td {
+            border: 1px solid black;
+            color:black;
+        }
+
+        th, td {
+            padding: 0px;
+            text-align: left;
+            font-size:12px;
+        }
+
+        /* Print specific styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .printable, .printable * {
+                visibility: visible;
+            }
+
+            .printable {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="site-mobile-menu site-navbar-target">
+        <div class="site-mobile-menu-header">
+            <div class="site-mobile-menu-close">
+                <span class="icofont-close js-menu-toggle"></span>
+            </div>
+        </div>
+        <div class="site-mobile-menu-body"></div>
+    </div>
+
+    {% include 'index_menu.html' %}
+
+
+        <br><br><br>
+
+      <div class="container">
+        <div class="row justify-content-center align-items-center">
+          <div class="col-lg-9 text-center mt-5">
+            <h1 class="heading" data-aos="fade-up"> TripSheet</h1>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+	<!-- end header -->
+    <div class="printable">
+    {% if trips %}
+    <br/>
+    <a href="javascript:void(0);" onclick="printAndDelete()" class="btn btn-danger btn-print no-print">Print</a>
+    <div class="table-responsive">
+            <table border="1" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <td colspan="3" style="font-size:12px;">
+                         <p>DRIVER'S NAME: {{ trips.first.DriverName }}</p>
+                        <p>VEHICLE NO.: {{ trips.first.VehicalNo }}</p>
+                        <p>DATE & TIME: {{ trips.first.Date }} {{ trips.first.Time }}</p>
+</td>
+                        <td style="font-size:12px; text-align: right;" colspan="2">
+                        <p >Supervisor: {{ trips.first.username }}</p>
+                            <p>Start Time: ___________</p>
+                            <p>Signature: ______________</p>
+                        </td>
+                        <td style="font-size:12px;" colspan="3">
+                        <p style="text-align: right;">{{ trips.first.branch }}</p>
+                            <p style="text-align: right;">{{ branchaddress }}</p>
+                    </td>
+                    </tr>
+                    <tr>
+<td style="font-size:12px;" colspan="5">
+    <p><strong>Load Summary:</strong></p>
+    <p><strong>
+        Orders: {{ track_number_count }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+        Packages: {{ total_qty }}&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Weight: {{ total_weight }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Value: {{ grand_price }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Above 50k Value: {{prod_price_count}}</strong>
+    </p>
+</td>
+
+                        <td style="font-size:12px;text-align: right;" colspan="3">
+                            <p>Start Time:____________</p>
+                            <p>Signature: _______________</p>
+                            <p>( {{ trips.first.DriverName }} )</p>
+                        </td>
+                    </tr>
+
+                    <tr style="font-size:12px;">
+                        <th style="width: 5%;">SL/N</th>
+                        <th style="width: 5%;">ORDER No( {{ track_number_count }} )</th>
+                        <th style="width: 5%;">PACKAGES ( {{total_qty}} )</th>
+                        <th style="width: 10%;">WEIGHT ( {{total_weight}} )</th>
+                        <th style="width: 10%;"> VALUE ( {{ grand_price }} )</th>
+                        <th style="width: 10%;">DESTINATION</th>
+                        <th style="width: 10%;">PAYER</th>
+                        <th style="width: 3%;">Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trip in trips %}
+                    <tr style="font-size:15px;">
+                        <td style="border-bottom: none;">{{ forloop.counter }}</td>
+                        <td style="border-top: none;">{{ trip.LRno }}</td>
+                        <td style="border-top: none;">{{ trip.qty }}</td>
+                        <td style="border-top: none;">{{ trip.weight }}</td>
+<td style="font-weight: {% if trip.prod_price >= 50000 %}bold{% else %}normal{% endif %};">
+    {{ trip.prod_price }}
+</td>
+                        <td style="border-bottom: none;">{{ trip.dest }}</td>
+                        <td style="border-bottom: none;">{{ trip.pay_status }}</td>
+                        <td style="border-bottom: none;">
+                                {{ trip.freight }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <br/>
+
+
+        </div>
+        {% endif %}
+    </div>
+    <script>
+function printAndDelete() {
+    // Trigger the print dialog
+    window.print();
+
+    // Collect the necessary data
+    const vehicleNumber = '{{ trips.first.VehicalNo }}';
+    const date = '{{ trips.first.Date }}';
+
+    // Send an AJAX request to delete the data
+    $.ajax({
+        type: 'POST',
+        url: '{% url "delete_trip_sheet_data" %}',  // Ensure this URL pattern matches your Django URL configuration
+        data: {
+            'vehical': vehicleNumber,  // Ensure these are correctly set
+            't3': date,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            if (response.status === 'success') {
+                console.log('Data deleted successfully.');
+                // Optionally, you can redirect or notify the user
+            } else {
+                console.error('Error deleting data: ', response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX error: ', status, error);
+        }
+    });
+}
+
+    </script>
+
+    <div class="no-print">
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+
+            </div>
+        </div>
+        <div id="overlayer"></div>
+        <div class="loader">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'js/tiny-slider.js' %}"></script>
+        <script src="{% static 'js/aos.js' %}"></script>
+        <script src="{% static 'js/navbar.js' %}"></script>
+        <script src="{% static 'js/counter.js' %}"></script>
+        <script src="{% static 'js/custom.js' %}"></script>
+    </div>
+</body>
+</html>

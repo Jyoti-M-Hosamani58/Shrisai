@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Untree.co" />
+    <link rel="shortcut icon" href="{% static 'favicon.png' %}" />
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="bootstrap, bootstrap5" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'fonts/flaticon/font/flaticon.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'css/tiny-slider.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/aos.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <title>
+Consignment    </title>
+      <style>
+          .suggestions-box {
+    border: 1px solid #ddd;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: white;
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+}
+
+.suggestions-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.suggestions-box li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.suggestions-box li:hover {
+    background-color: #f0f0f0;
+}
+
+      </style>
+  </head>
+  <body>
+    <div class="site-mobile-menu site-navbar-target">
+      <div class="site-mobile-menu-header">
+        <div class="site-mobile-menu-close">
+          <span class="icofont-close js-menu-toggle"></span>
+        </div>
+      </div>
+      <div class="site-mobile-menu-body"></div>
+    </div>
+
+    {% include 'index_menu.html' %}
+<br><br><br>
+     <div class="container">
+        <div class="row justify-content-center align-items-center">
+          <div class="col-lg-9 text-center mt-5">
+            <h1 class="heading" data-aos="fade-up">Edit Shipper</h1>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+<div class="background-container"></div>
+    <div class="content">
+    <div id="consignmentForm" class="container">
+        <form method="post" id="consignment-form">
+            {% csrf_token %}
+    <p style="color:red;text-align:center;font-size:22px;font-weight:bold">{{msg}}</p>
+            <div class="row">
+
+            <div class="row g-3">
+
+<div class="col-md-6">
+    <label for="senderName">Shipper</label>
+    <input type="text" id="senderName" name="a1" value="{{ data.sender_name }}" class="form-control" required list="consignor_name" oninput="showConsignorDatalist()" onchange="fetchSenderDetails()">
+    <datalist id="consignor_name"></datalist> <!-- Container for the suggestions -->
+
+
+    <label for="sendergst">Shipper GST:</label>
+    <input type="text" id="sendergst" name="a3" value="{{ data.sender_address }}" class="form-control">
+
+
+    <label for="senderAddress">Shipper Address:</label>
+<textarea id="senderAddress" name="a4" class="form-control" rows="4" required>{{ data.sender_GST }}</textarea>
+<br/>
+</div>
+                <div class="col-md-6">
+
+    <label for="senderMobile">Shipper Mobile:</label>
+    <input type="tel" id="senderMobile" name="a2" value="{{ data.sender_mobile }}" class="form-control" list="consignor_number" oninput="showConsignorNumberDatalist()" onchange="fetchSenderNumberDetails()" required>
+    <datalist id="consignor_number"></datalist>
+
+    <label for="senderpassword">Shipper Password:</label>
+    <input type="text" id="senderpassword" name="a5" value="{{ data.sender_password }}" class="form-control">
+<br/>
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+</div>
+
+            </div>
+
+
+</div>
+
+
+
+        </form>
+
+	</div>
+
+
+
+    </div>
+
+ <div class="row mt-5">
+          <div class="col-12 text-center">
+            <!--
+              **==========
+              NOTE:
+              Please don't remove this copyright link unless you buy the license here https://untree.co/license/
+              **==========
+            -->
+          </div>
+        </div>
+      </div>
+      <!-- /.container -->
+    </div>
+    <!-- /.site-footer -->
+
+    <!-- Preloader -->
+    <div id="overlayer"></div>
+    <div class="loader">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/tiny-slider.js' %}"></script>
+    <script src="{% static 'js/aos.js' %}"></script>
+    <script src="{% static 'js/navbar.js' %}"></script>
+    <script src="{% static 'js/counter.js' %}"></script>
+    <script src="{% static 'js/custom.js' %}"></script>
+  </body>
+</html>

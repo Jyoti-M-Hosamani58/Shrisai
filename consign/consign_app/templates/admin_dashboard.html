@@ -1,0 +1,227 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="Untree.co" />
+    <link rel="shortcut icon" href="{% static 'favicon.png' %}" />
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="bootstrap, bootstrap5" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'fonts/flaticon/font/flaticon.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'css/tiny-slider.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/aos.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <title>Consignment</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+
+
+    <style>
+        /* CSS for horizontal scrolling */
+        .table-container {
+            overflow-x: auto; /* Enable horizontal scrolling */
+            -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+        }
+
+        table {
+            width: 100%; /* Ensure the table takes full width */
+            min-width: 600px; /* Adjust based on the expected minimum width */
+        }
+    </style>
+
+</head>
+<body>
+    <div class="site-mobile-menu site-navbar-target">
+        <div class="site-mobile-menu-header">
+            <div class="site-mobile-menu-close">
+                <span class="icofont-close js-menu-toggle"></span>
+            </div>
+        </div>
+        <div class="site-mobile-menu-body"></div>
+    </div>
+
+    {% include 'index_menu.html' %}
+
+  <br><br><br>
+
+      <div class="container">
+        <div class="row justify-content-center align-items-center">
+          <div class="col-lg-9 text-center mt-5">
+            <h1 class="heading" data-aos="fade-up"> Admin Consignment DashBoard</h1>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+	<!-- end header -->
+<script>
+   function showBranchDatalist() {
+    const input = document.getElementById('t2');
+    const datalist = document.getElementById('branch');
+
+    if (input.value.length >= 2) {
+        fetch(`/get_branch?query=${encodeURIComponent(input.value)}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched data:', data); // Debugging: Check the data in the console
+                datalist.innerHTML = ''; // Clear previous options
+
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(number => {
+                        const option = document.createElement('option');
+                        option.value = number;
+                        datalist.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = 'No results';
+                    datalist.appendChild(option);
+                }
+            })
+            .catch(error => console.error('Error fetching vehicle numbers:', error));
+    } else {
+        datalist.innerHTML = ''; // Clear the datalist if fewer than 2 characters
+    }
+}
+
+
+</script>
+
+        <form method="post" action="{% url 'admin_dashboard' %}">
+        {% csrf_token %}
+    <div class="row">
+         <div class="col-md-3">
+            <label> Date</label>
+            <input type="date" class="form-control" id="date" name="date" >
+        </div>
+
+      <div class="col-md-3">
+        <label>Branch</label>
+<input type="text" class="form-control" id="t2" name="t2" list="branch" oninput="showBranchDatalist()">
+    <datalist id="branch"></datalist>
+      </div>
+
+      <div class="col-md-3">
+        <label></label>
+<button type="submit" class="form-control btn-primary">Search</button>
+      </div>
+    </div>
+    </form>
+<!-- Add custom CSS -->
+<style>
+  .dashboard-container {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .dashboard-header {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .branch-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #343a40;
+  }
+
+  .consignment-card {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .consignment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .stage-list {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  .stage-list li {
+    background-color: #f1f3f5;
+    margin-bottom: 8px;
+    padding: 10px;
+    border-radius: 5px;
+  }
+</style>
+
+<!-- Dashboard Content -->
+<p>Total Consignments for {{ selected_date }}:</p>
+
+{% for branch_data in branches_data %}
+  <div class="container mt-4 dashboard-container">
+    <div class="row">
+      <div class="col-md-12">
+        <h3 class="branch-header">Branch: {{ branch_data.branch }}</h3>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="consignment-card">
+          <h4>Stage-wise Consignment Counts</h4>
+          <ul class="stage-list">
+            {% for stage, count in branch_data.stage_counts.items %}
+              <li>{{ stage }}: <strong>{{ count }}</strong></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="consignment-card">
+          <h4>Total Consignments: </h4>
+          <p><strong>{{ branch_data.total_consignments }}</strong></p>
+          <h4>Pending Consignments</h4>
+          <p><strong>{{ branch_data.untracked_consignments }}</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
+
+<div class="no-print">
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+            </div>
+        </div>
+        <div id="overlayer"></div>
+        <div class="loader">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'js/tiny-slider.js' %}"></script>
+        <script src="{% static 'js/aos.js' %}"></script>
+        <script src="{% static 'js/navbar.js' %}"></script>
+        <script src="{% static 'js/counter.js' %}"></script>
+        <script src="{% static 'js/custom.js' %}"></script>
+    </div>
+</body>
+</html>
